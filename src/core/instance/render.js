@@ -21,8 +21,28 @@ export function initRender (vm: Component) {
   const options = vm.$options
   const parentVnode = vm.$vnode = options._parentVnode // the placeholder node in parent tree
   const renderContext = parentVnode && parentVnode.context
+
+  // qifa 用来访问被插槽分发的内容。每个具名插槽 有其相应的属性 (例如：slot="foo" 中的内容将会在 vm.$slots.foo 中被找到)。
+  // default 属性包括了所有没有被包含在具名插槽中的节点。在使用渲染函数书写一个组件时，访问 vm.$slots 最有帮助
+  // 使用render函数示例
+  // Vue.component('blog-post', {
+  //   render: function (createElement) {
+  //     var header = this.$slots.header
+  //     var body   = this.$slots.default
+  //     var footer = this.$slots.footer
+  //     return createElement('div', [
+  //       createElement('header', header),
+  //       createElement('main', body),
+  //       createElement('footer', footer)
+  //     ])
+  //   }
+  // })
   vm.$slots = resolveSlots(options._renderChildren, renderContext)
+
+  // qifa 用来访问作用域插槽。对于包括 默认 slot 在内的每一个插槽，该对象都包含一个返回相应 VNode 的函数。
+  // vm.$scopedSlots 在使用渲染函数开发一个组件时特别有用
   vm.$scopedSlots = emptyObject
+
   // bind the createElement fn to this instance
   // so that we get proper render context inside it.
   // args order: tag, data, children, normalizationType, alwaysNormalize
@@ -37,6 +57,12 @@ export function initRender (vm: Component) {
   const parentData = parentVnode && parentVnode.data
 
   /* istanbul ignore else */
+  // qifa vm.$attrs
+  // 包含了父作用域中不作为 prop 被识别 (且获取) 的特性绑定 (class 和 style 除外)。当一个组件没有声明任何 prop 时，
+  // 这里会包含所有父作用域的绑定 (class 和 style 除外)，并且可以通过 v-bind="$attrs" 传入内部组件——在创建高级别的组件时非常有用。
+
+  // qifa vm.$listeners
+  // 包含了父作用域中的 (不含 .native 修饰器的) v-on 事件监听器。它可以通过 v-on="$listeners" 传入内部组件——在创建更高层次的组件时非常有用
   if (process.env.NODE_ENV !== 'production') {
     defineReactive(vm, '$attrs', parentData && parentData.attrs || emptyObject, () => {
       !isUpdatingChildComponent && warn(`$attrs is readonly.`, vm)
