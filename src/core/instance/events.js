@@ -10,6 +10,7 @@ import {
 import { updateListeners } from '../vdom/helpers/index'
 
 export function initEvents (vm: Component) {
+  // qifa 初始化时定义的对象，用于保存各个事件的名称，同时每个事件都有一个事件队列，用数组保存
   vm._events = Object.create(null)
   vm._hasHookEvent = false
   // init parent attached events
@@ -45,6 +46,12 @@ export function updateComponentListeners (
 
 export function eventsMixin (Vue: Class<Component>) {
   const hookRE = /^hook:/
+
+  // qifa 监听当前实例上的自定义事件。事件可以由vm.$emit触发。回调函数会接收所有传入事件触发函数的额外参数。
+  // vm.$on('test', function (msg) {
+  //   console.log(msg)
+  // })
+  // vm.$emit('test', 'hi')
   Vue.prototype.$on = function (event: string | Array<string>, fn: Function): Component {
     const vm: Component = this
     if (Array.isArray(event)) {
@@ -52,6 +59,7 @@ export function eventsMixin (Vue: Class<Component>) {
         this.$on(event[i], fn)
       }
     } else {
+      // qifa 将回调函数保存在 vm._events[event] 数组中
       (vm._events[event] || (vm._events[event] = [])).push(fn)
       // optimize hook:event cost by using a boolean flag marked at registration
       // instead of a hash lookup
@@ -62,6 +70,7 @@ export function eventsMixin (Vue: Class<Component>) {
     return vm
   }
 
+  // qifa 监听一个自定义事件，但是只触发一次，在第一次触发之后移除监听器
   Vue.prototype.$once = function (event: string, fn: Function): Component {
     const vm: Component = this
     function on () {
@@ -72,10 +81,11 @@ export function eventsMixin (Vue: Class<Component>) {
     vm.$on(event, on)
     return vm
   }
-
+  // qifa 移除自定义事件监听器
   Vue.prototype.$off = function (event?: string | Array<string>, fn?: Function): Component {
     const vm: Component = this
     // all
+    // qifa 如果没有提供参数，则移除所有的事件监听器
     if (!arguments.length) {
       vm._events = Object.create(null)
       return vm
@@ -92,10 +102,12 @@ export function eventsMixin (Vue: Class<Component>) {
     if (!cbs) {
       return vm
     }
+    // qifa 如果只提供了事件，则移除该事件所有的监听器
     if (!fn) {
       vm._events[event] = null
       return vm
     }
+    // 如果同时提供了事件与回调，则只移除这个回调的监听器。比如事件 doA 有两个回调处理函数，则vm._events[doA]保存了一个数组，数组里每一项是个回调函数
     if (fn) {
       // specific handler
       let cb
@@ -111,9 +123,11 @@ export function eventsMixin (Vue: Class<Component>) {
     return vm
   }
 
+  // qifa 触发当前实例上的事件。附加参数都会传给监听器回调
   Vue.prototype.$emit = function (event: string): Component {
     const vm: Component = this
     if (process.env.NODE_ENV !== 'production') {
+      // qifa 事件名要小写
       const lowerCaseEvent = event.toLowerCase()
       if (lowerCaseEvent !== event && vm._events[lowerCaseEvent]) {
         tip(
@@ -128,6 +142,7 @@ export function eventsMixin (Vue: Class<Component>) {
     let cbs = vm._events[event]
     if (cbs) {
       cbs = cbs.length > 1 ? toArray(cbs) : cbs
+      // qifa 可以传参数 vm.$emit(eventName, [...args])
       const args = toArray(arguments, 1)
       for (let i = 0, l = cbs.length; i < l; i++) {
         try {

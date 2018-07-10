@@ -80,6 +80,7 @@ export function renderMixin (Vue: Class<Component>) {
   // install runtime convenience helpers
   installRenderHelpers(Vue.prototype)
 
+  // qifa 将回调延迟到下次 DOM 更新循环之后执行
   Vue.prototype.$nextTick = function (fn: Function) {
     return nextTick(fn, this)
   }
