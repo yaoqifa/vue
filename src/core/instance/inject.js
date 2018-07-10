@@ -3,7 +3,7 @@
 import { hasOwn } from 'shared/util'
 import { warn, hasSymbol } from '../util/index'
 import { defineReactive, toggleObserving } from '../observer/index'
-
+// qifa 关于provide和inject， 参考 https://cn.vuejs.org/v2/api/#provide-inject
 export function initProvide (vm: Component) {
   const provide = vm.$options.provide
   if (provide) {

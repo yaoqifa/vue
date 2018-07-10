@@ -125,7 +125,7 @@ function initData (vm: Component) {
   }
   // proxy data on instance
   // qifa data与props、methods里属性名不能冲突
-  // 最后把所有data里的属性 代理到vm上，所以data里定义a1:2 在methods 可以 this.a1 取到值
+  // 最后把所有data里的属性 代理到vm上，所以data里定义a1:2 在methods 可以 this.a1 取到值 (重要)
   const keys = Object.keys(data)
   const props = vm.$options.props
   const methods = vm.$options.methods
@@ -252,7 +252,7 @@ function createComputedGetter (key) {
     }
   }
 }
-
+// qifa 初始化methods，添加到vm上，不能重复
 function initMethods (vm: Component, methods: Object) {
   const props = vm.$options.props
   for (const key in methods) {
@@ -319,6 +319,7 @@ export function stateMixin (Vue: Class<Component>) {
   const propsDef = {}
   propsDef.get = function () { return this._props }
   if (process.env.NODE_ENV !== 'production') {
+    // qifa 拦截，不让直接修改 $data
     dataDef.set = function (newData: Object) {
       warn(
         'Avoid replacing instance root $data. ' +
@@ -326,16 +327,29 @@ export function stateMixin (Vue: Class<Component>) {
         this
       )
     }
+    // qifa 拦截，不让直接修改 $props
     propsDef.set = function () {
       warn(`$props is readonly.`, this)
     }
   }
+  // qifa Vue 实例观察的数据对象。Vue 实例代理了对其 data 对象属性的访问
   Object.defineProperty(Vue.prototype, '$data', dataDef)
+
+  // qifa 前组件接收到的 props 对象。Vue 实例代理了对其 props 对象属性的访问
   Object.defineProperty(Vue.prototype, '$props', propsDef)
 
+  // qifa  vm.$set( target, key, value ) 这是全局 Vue.set 的别名 返回设置的值
   Vue.prototype.$set = set
+
+  // qifa vm.$delete( target, key ) 全局Vue.delete 的别名
   Vue.prototype.$delete = del
 
+  // qifa 观察 Vue 实例变化的一个表达式或计算属性函数。回调函数得到的参数为新值和旧值。表达式只接受监督的键路径。对于更复杂的表达式，用一个函数取代
+  // options 可以有deep属性，可以有immediate属性
+  // {
+  //   deep: true, 为了发现对象内部值的变化，可以在选项参数中指定 deep: true 。注意监听数组的变动不需要这么做。
+  //   immediate: true 在选项参数中指定 immediate: true 将立即以表达式的当前值触发回调
+  // }
   Vue.prototype.$watch = function (
     expOrFn: string | Function,
     cb: any,

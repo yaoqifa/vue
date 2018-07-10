@@ -16,7 +16,8 @@ function Vue (options) {
 }
 /** qifa 给prototype上扩展方法 */
 
-initMixin(Vue) // 主要定义Vue.prototype._init
+// qifa 主要定义Vue.prototype._init，再initMixin 里 给vm分配了uid，定义了实例属性 $root $refs等 最后$mount挂载到页面上
+initMixin(Vue)
 stateMixin(Vue)
 eventsMixin(Vue)
 lifecycleMixin(Vue)

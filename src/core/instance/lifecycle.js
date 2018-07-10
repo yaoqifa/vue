@@ -332,6 +332,7 @@ export function callHook (vm: Component, hook: string) {
   if (handlers) {
     for (let i = 0, j = handlers.length; i < j; i++) {
       try {
+        // qifa 调用,vm作为handlers[i]的上下文，比如 beforeCreate，但为什么是个数组？
         handlers[i].call(vm)
       } catch (e) {
         handleError(e, vm, `${hook} hook`)
