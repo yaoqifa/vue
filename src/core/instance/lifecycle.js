@@ -21,7 +21,15 @@ import {
 export let activeInstance: any = null
 export let isUpdatingChildComponent: boolean = false
 
+// qifa 给vm实例挂载一些初始化lifecycle 属性，比如$parent $root $refs $children _isMounted
 export function initLifecycle (vm: Component) {
+  // qifa 用于当前 Vue 实例的初始化选项。需要在选项中包含自定义属性时会有用处
+  // new Vue({
+  //   customOption: 'foo',
+  //   created: function () {
+  //     console.log(this.$options.customOption) // => 'foo'
+  //   }
+  // })
   const options = vm.$options
 
   // locate first non-abstract parent
@@ -32,11 +40,13 @@ export function initLifecycle (vm: Component) {
     }
     parent.$children.push(vm)
   }
-
+  // qifa 父实例，如果当前实例有的话
   vm.$parent = parent
+  // qifa 当前组件树的根 Vue 实例。如果当前实例没有父实例，此实例将会是其自己
   vm.$root = parent ? parent.$root : vm
-
+  // qifa 当前实例的直接子组件
   vm.$children = []
+  // qifa 一个对象，持有注册过 ref 特性 的所有 DOM 元素和组件实例
   vm.$refs = {}
 
   vm._watcher = null

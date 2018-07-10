@@ -10,10 +10,18 @@ import { initLifecycle, callHook } from './lifecycle'
 import { initProvide, initInjections } from './inject'
 import { extend, mergeOptions, formatComponentName } from '../util/index'
 
+// qifa 每个Vue的实例都有一个唯一的uid，包括Vue.extend扩展的实例
 let uid = 0
 
 export function initMixin (Vue: Class<Component>) {
   Vue.prototype._init = function (options?: Object) {
+    // options长这样
+    // {
+    //   el: '#demo',
+    //   data: {
+    //     treeData: data
+    //   }
+    // }
     const vm: Component = this
     // a uid
     vm._uid = uid++
@@ -30,12 +38,13 @@ export function initMixin (Vue: Class<Component>) {
     vm._isVue = true
     // merge options
     if (options && options._isComponent) {
-      // optimize internal component instantiation
-      // since dynamic options merging is pretty slow, and none of the
-      // internal component options needs special treatment.
+      // optimize internal component instantiation 优化内部组件实例
+      // since dynamic options merging is pretty slow, and none of the 因为动态options的合并非常慢
+      // internal component options needs special treatment. 都不需要特殊处理
       initInternalComponent(vm, options)
     } else {
       // qifa 所以在程序里可以通过$options.el访问到 new 里传入的el， $options.data 访问到new Vue 中传入的data
+      // qifa vm是Vue的实例， 则 vm.constructor 指向的应该是Vue
       vm.$options = mergeOptions(
         resolveConstructorOptions(vm.constructor),
         options || {},
@@ -49,6 +58,7 @@ export function initMixin (Vue: Class<Component>) {
       vm._renderProxy = vm
     }
     // expose real self
+    // qifa 调用一系列函数，初始化vm实例
     vm._self = vm
     initLifecycle(vm)
     initEvents(vm)
