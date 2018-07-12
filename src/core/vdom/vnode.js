@@ -69,7 +69,7 @@ export default class VNode {
     return this.componentInstance
   }
 }
-
+// qifa 创建一个空的Vnode, 是一种注释节点
 export const createEmptyVNode = (text: string = '') => {
   const node = new VNode()
   node.text = text

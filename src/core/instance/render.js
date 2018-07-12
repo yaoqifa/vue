@@ -47,9 +47,13 @@ export function initRender (vm: Component) {
   // so that we get proper render context inside it.
   // args order: tag, data, children, normalizationType, alwaysNormalize
   // internal version is used by render functions compiled from templates
+
+  // qifa 被编译生成的render函数使用的，false指模板编译的
   vm._c = (a, b, c, d) => createElement(vm, a, b, c, d, false)
   // normalization is always applied for the public version, used in
   // user-written render functions.
+
+  // qifa 定义了$createElement 给用户手写render函数提供的
   vm.$createElement = (a, b, c, d) => createElement(vm, a, b, c, d, true)
 
   // $attrs & $listeners are exposed for easier HOC creation.
@@ -84,6 +88,19 @@ export function renderMixin (Vue: Class<Component>) {
   Vue.prototype.$nextTick = function (fn: Function) {
     return nextTick(fn, this)
   }
+  // qifa _render方法是实例的一个私有方法，它用来把实例渲染成一个虚拟 Node, 返回VNode
+  // qifa eg:
+  //   <div id="app">
+  //   {{ message }}
+  // </div>
+  // 相当于我们编写如下 render 函数：
+  // render: function (createElement) {
+  //   return createElement('div', {
+  //      attrs: {
+  //         id: 'app'
+  //       },
+  //   }, this.message)
+  // }
 
   Vue.prototype._render = function (): VNode {
     const vm: Component = this
@@ -116,6 +133,7 @@ export function renderMixin (Vue: Class<Component>) {
       if (process.env.NODE_ENV !== 'production') {
         if (vm.$options.renderError) {
           try {
+            // vm._renderProxy 可能就是vm本身
             vnode = vm.$options.renderError.call(vm._renderProxy, vm.$createElement, e)
           } catch (e) {
             handleError(e, vm, `renderError`)

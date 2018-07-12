@@ -29,15 +29,17 @@ export function createElement (
   context: Component,
   tag: any,
   data: any,
-  children: any,
+  children: any, // qifa children 表示当前 VNode 的子节点，它是任意类型的，它接下来需要被规范为标准的 VNode 数组，子节点最后也是Vnode,形成Vdom树
   normalizationType: any,
   alwaysNormalize: boolean
 ): VNode | Array<VNode> {
+  // qifa 兼容不传data的情况
   if (Array.isArray(data) || isPrimitive(data)) {
     normalizationType = children
     children = data
     data = undefined
   }
+  // qifa true指用户定义的render函数，从../instance/render.js initRender里可以看到
   if (isTrue(alwaysNormalize)) {
     normalizationType = ALWAYS_NORMALIZE
   }
@@ -51,12 +53,17 @@ export function _createElement (
   children?: any,
   normalizationType?: number
 ): VNode | Array<VNode> {
+  /*
+    qifa 如果data未定义（undefined或者null）或者是data的__ob__已经定义（代表已经被observed，上面绑定了Oberver对象），
+    https://cn.vuejs.org/v2/guide/render-function.html#约束
+    那么创建一个空节点， data不能是响应式的
+  */
   if (isDef(data) && isDef((data: any).__ob__)) {
-    process.env.NODE_ENV !== 'production' && warn(
-      `Avoid using observed data object as vnode data: ${JSON.stringify(data)}\n` +
-      'Always create fresh vnode data objects in each render!',
-      context
-    )
+    // process.env.NODE_ENV !== 'production' && warn(
+    //   `Avoid using observed data object as vnode data: ${JSON.stringify(data)}\n` +
+    //   'Always create fresh vnode data objects in each render!',
+    //   context
+    // )
     return createEmptyVNode()
   }
   // object syntax in v-bind
@@ -79,6 +86,8 @@ export function _createElement (
       )
     }
   }
+
+  // qifa 开始规范化Children， children最后变成一维数组
   // support single function children as default scoped slot
   if (Array.isArray(children) &&
     typeof children[0] === 'function'
@@ -92,6 +101,9 @@ export function _createElement (
   } else if (normalizationType === SIMPLE_NORMALIZE) {
     children = simpleNormalizeChildren(children)
   }
+  // qifa 结束规范化Children
+
+  // qifa 开始创建vnode实例
   let vnode, ns
   if (typeof tag === 'string') {
     let Ctor
@@ -127,6 +139,7 @@ export function _createElement (
   } else {
     return createEmptyVNode()
   }
+  // qifa 结束创建vnode实例
 }
 
 function applyNS (vnode, ns, force) {

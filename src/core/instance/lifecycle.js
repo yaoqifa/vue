@@ -194,6 +194,8 @@ export function mountComponent (
     }
   } else {
     updateComponent = () => {
+      // qifa vm_render() 最后创建一个VNode
+      // vm._update() 将Vnode 转换成真实dom节点并渲染出来
       vm._update(vm._render(), hydrating)
     }
   }
