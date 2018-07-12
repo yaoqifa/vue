@@ -58,6 +58,7 @@ export function initLifecycle (vm: Component) {
 }
 
 export function lifecycleMixin (Vue: Class<Component>) {
+  // qifa 首次渲染或数据更新的时候调用，_update 方法的作用是把 VNode 渲染成真实的 DOM
   Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
     const vm: Component = this
     const prevEl = vm.$el
@@ -69,6 +70,7 @@ export function lifecycleMixin (Vue: Class<Component>) {
     // based on the rendering backend used.
     if (!prevVnode) {
       // initial render
+      // qifa vm.__patch__ 最终调用的方法在Vdom/patch.js 里定义的createPatchFunction 方法返回的patch函数
       vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */)
     } else {
       // updates

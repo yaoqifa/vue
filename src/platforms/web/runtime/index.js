@@ -30,6 +30,7 @@ Vue.config.isUnknownElement = isUnknownElement
 extend(Vue.options.directives, platformDirectives)
 extend(Vue.options.components, platformComponents)
 
+// qifa 在这里定义了vm的__patch__私有方法，该方法在../instance/lifecycle.js 下的Vue.prototype._update 重点使用
 // install platform patch function
 Vue.prototype.__patch__ = inBrowser ? patch : noop
 

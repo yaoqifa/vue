@@ -2,6 +2,8 @@
 
 import { namespaceMap } from 'web/util/index'
 
+// qifa 这里封装了一系列操作dom的方法
+
 export function createElement (tagName: string, vnode: VNode): Element {
   const elm = document.createElement(tagName)
   if (tagName !== 'select') {

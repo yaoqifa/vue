@@ -66,7 +66,7 @@ function createKeyToOldIdx (children, beginIdx, endIdx) {
   }
   return map
 }
-
+// qifa 创建patch的函数，返回patch函数
 export function createPatchFunction (backend) {
   let i, j
   const cbs = {}
@@ -122,6 +122,7 @@ export function createPatchFunction (backend) {
 
   let creatingElmInVPre = 0
 
+  // qifa 作用就是把vnode挂载到真实的dom上
   function createElm (
     vnode,
     insertedVnodeQueue,
@@ -681,7 +682,8 @@ export function createPatchFunction (backend) {
       return node.nodeType === (vnode.isComment ? 8 : 3)
     }
   }
-
+  // qifa oldVnode 表示旧的 VNode 节点，它也可以不存在或者是一个 DOM 对象；vnode 表示执行 _render 后返回的 VNode 的节点；
+  // hydrating 表示是否是服务端渲染；removeOnly 是给 transition-group 用的
   return function patch (oldVnode, vnode, hydrating, removeOnly) {
     if (isUndef(vnode)) {
       if (isDef(oldVnode)) invokeDestroyHook(oldVnode)
@@ -691,11 +693,13 @@ export function createPatchFunction (backend) {
     let isInitialPatch = false
     const insertedVnodeQueue = []
 
+    // qifa oldVnode 不存在
     if (isUndef(oldVnode)) {
       // empty mount (likely as component), create new root element
       isInitialPatch = true
       createElm(vnode, insertedVnodeQueue)
     } else {
+      // qifa 有nodeType属性，证明是一个真实的dom节点
       const isRealElement = isDef(oldVnode.nodeType)
       if (!isRealElement && sameVnode(oldVnode, vnode)) {
         // patch existing root node
@@ -725,10 +729,12 @@ export function createPatchFunction (backend) {
           }
           // either not server-rendered, or hydration failed.
           // create an empty node and replace it
+          // qifa 将真实 dom 转化成Vnode，并且oldVnode.elm 保存了真实的dom
           oldVnode = emptyNodeAt(oldVnode)
         }
 
         // replacing existing element
+        // qifa 比如 oldElm 是#app, 则parentElm 是body
         const oldElm = oldVnode.elm
         const parentElm = nodeOps.parentNode(oldElm)
 
