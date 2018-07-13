@@ -108,10 +108,11 @@ export function createComponent (
   if (isUndef(Ctor)) {
     return
   }
-
+  //  qifa 其实context就是vm, 其实_base存的是Vue, 所以最终baseCtor指的是Vue
   const baseCtor = context.$options._base
 
   // plain options object: turn it into a constructor
+  // qifa 如果是对象，则把Ctor转成构造器
   if (isObject(Ctor)) {
     Ctor = baseCtor.extend(Ctor)
   }

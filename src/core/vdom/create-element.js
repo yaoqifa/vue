@@ -1,4 +1,5 @@
 /* @flow */
+// qifa 从instance/render.js 的_render过来的
 
 import config from '../config'
 import VNode, { createEmptyVNode } from './vnode'

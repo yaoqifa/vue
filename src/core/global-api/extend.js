@@ -47,8 +47,10 @@ export function initExtend (Vue: GlobalAPI) {
   */
   Vue.extend = function (extendOptions: Object): Function {
     extendOptions = extendOptions || {}
+    // qifa 这里的this其实指向Vue，因为这是Vue的静态方法
     const Super = this
     const SuperId = Super.cid
+    // qifa 缓存的优化
     const cachedCtors = extendOptions._Ctor || (extendOptions._Ctor = {})
     if (cachedCtors[SuperId]) {
       return cachedCtors[SuperId]
